@@ -41,6 +41,10 @@ public class XMLElementStringifier implements ParametrableXMLStringifier
 		{
 			return new XMLProcessingInstructionStringifier(this.element, this.getOptions()).toString(depth);
 		}
+		else if(this.element.getType() == XMLElementType.COMMENT && this.hasToWriteComments())
+		{
+			return new XMLCommentStringifier(this.element, this.getOptions()).toString(depth);
+		}
 		else if(this.element.getType() == XMLElementType.NODE)
 		{
 			if(this.element.isLeaf() && this.useOrphans())

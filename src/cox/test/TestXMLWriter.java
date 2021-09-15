@@ -5,6 +5,7 @@ import static jul.nla.Asserts.that;
 
 import cox.model.document.SimpleXMLDocument;
 import cox.model.document.XMLDocument;
+import cox.model.document.element.XMLCommentElement;
 import cox.model.document.element.XMLElement;
 import cox.model.document.element.XMLNodeElement;
 import cox.model.document.element.XMLProcessingInstructionElement;
@@ -165,5 +166,44 @@ public class TestXMLWriter
 		SimpleXMLDocument document = new SimpleXMLDocument("1.1", "UTF-16", true, docRoot);
 		
 		asserts(that(XMLWriter.write(document, XMLOutputOptions.WRITE_DECLARATION, XMLOutputOptions.INDENT)).hasToString("<?xml version=\"1.1\" encoding=\"UTF-16\" standalone=\"yes\"?>\n<?custom-key custom-value?>\n<root>\n</root>"));
+	}
+	
+	@Test
+	public void testWriteCommentOnlyDocument()
+	{
+		XMLElement root = XMLElement.getEmptyNode();
+		new XMLCommentElement(root, " Simple comment ");
+		
+		XMLDocument document = new SimpleXMLDocument(root);
+		
+		asserts(that(XMLWriter.write(document, XMLOutputOptions.WRITE_COMMENTS)).hasToString("<!-- Simple comment -->"));
+	}
+	
+	@Test
+	public void testWriteMultipleCommentsDocument()
+	{
+		XMLElement root = XMLElement.getEmptyNode();
+		XMLElement rootElement = new XMLNodeElement(root, "root");
+		new XMLCommentElement(rootElement, " Simple comment ");
+		XMLElement item = new XMLNodeElement(rootElement, "item");
+		new XMLCommentElement(item, " Deep comment ");
+		
+		XMLDocument document = new SimpleXMLDocument(root);
+		
+		asserts(that(XMLWriter.write(document, XMLOutputOptions.WRITE_COMMENTS)).hasToString("<root><!-- Simple comment --><item><!-- Deep comment --></item></root>"));
+	}
+	
+	@Test
+	public void testWriteIndentedMultipleCommentsDocument()
+	{
+		XMLElement root = XMLElement.getEmptyNode();
+		XMLElement rootElement = new XMLNodeElement(root, "root");
+		new XMLCommentElement(rootElement, " Multiline\n\tcomment ");
+		XMLElement item = new XMLNodeElement(rootElement, "item");
+		new XMLCommentElement(item, " Deep comment ");
+		
+		XMLDocument document = new SimpleXMLDocument(root);
+		
+		asserts(that(XMLWriter.write(document, XMLOutputOptions.WRITE_COMMENTS, XMLOutputOptions.INDENT)).hasToString("<root>\n\t<!-- Multiline\n\tcomment -->\n\t<item>\n\t\t<!-- Deep comment -->\n\t</item>\n</root>"));
 	}
 }

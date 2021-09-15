@@ -30,6 +30,11 @@ public interface ParametrableXMLStringifier
 		return this.getOptions().contains(XMLOutputOptions.WRITE_DECLARATION);
 	}
 	
+	public default boolean hasToWriteComments()
+	{
+		return this.getOptions().contains(XMLOutputOptions.WRITE_COMMENTS);
+	}
+	
 	public default String pairsToAttributeString(Map<String, String> pairs)
 	{
 		String attributes = "";
